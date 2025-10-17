@@ -8,9 +8,14 @@ enum NumberType{
     VALID_NUM,
     VALID_ROW_NUM
 }
-enum SortOrderType {
+enum SortOrder {
     ASC,
     DESC
+}
+enum SearchTarget {
+    KEY,
+    VALUE,
+    BOTH
 }
 class UserInputDimensions {
     int row;
@@ -20,13 +25,15 @@ class UserInputDimensions {
 public class Main {    
     public static int rowTable;
     public static int colTable;
-    public static List<List<String>> table;
+    public static List<Map<String, String>> table;
     public static String fileName;
     public static boolean debug = true;
     private static final Scanner scanner = new Scanner(System.in);
 
-    static List<List<String>> fileReaderUtility(){
-        List<List<String>> tempTable;
+
+    /* 
+    static List<Map<String, String>> fileReaderUtility(){
+        List<Map<String, String>> tempTable;
         if(fileName.trim().isEmpty()){
             System.out.println("Please enter a file name");
             return table;
@@ -55,11 +62,11 @@ public class Main {
             colTable =  ((rowLength-1) / 3)-1;
             if(colTable <= -1) colTable = 0;
             if(debug) System.out.println("coltable: " + colTable);
-            tempTable = new ArrayList<List<String>>();
+            tempTable = new ArrayList<Map<String, String>>();
 
             if (debug) System.out.println("debug: unfilteredfielcontent size" + unFilteredFileContent.size());
             for(int i = 0; i < unFilteredFileContent.size(); i++){
-                tempTable.add(new ArrayList<>());
+                tempTable.add(new HashMap<>());
                 String charRow = unFilteredFileContent.get(i);
                 if (debug) System.out.println("debug: length = " + charRow.length());
                 if (debug) System.out.println("debug: charrow value: " + charRow);
@@ -70,7 +77,7 @@ public class Main {
                     if(j+2>= charRow.length()) {
                         System.out.println("invalid table check element count (3 elements per cell)");
                     };
-                    tempTable.get(i).add((charRow.charAt(j) + "" +charRow.charAt(j+1) + "" + charRow.charAt(j+2)));
+                    tempTable.get(i).put((charRow.charAt(j) + "" +charRow.charAt(j+1) + "" + charRow.charAt(j+2)));
 
                     if( !(j+3 >= charRow.length()) && charRow.charAt(j+3) != ' '){
                         System.out.println("Invalid table due to no space between elements (every 3 elements should have a space)");
@@ -114,6 +121,8 @@ public class Main {
         }
     }
 
+    */
+    
     static String randChars() {
         String aschii = "";
         //32 - 126 aschi char
@@ -126,19 +135,28 @@ public class Main {
         return aschii;
     }
     static void genTable() {
-        table = new ArrayList<List<String>>();
+        table = new ArrayList<Map<String, String>>();
         for (int i = 0; i < rowTable; i++) {
-            table.add(i, new ArrayList<>());
+            table.add(i, new HashMap<String, String>());
             for (int j = 0; j < colTable; j++) {
-                table.get(i).add(randChars());
+                String key  = randChars();
+
+                //Testing duplicate detection
+                //if(i==0 && j == 0) key = "aaa";
+                //if (i==0 && j==1) key = "aaa";
+
+                while(table.get(i).containsKey(key)) {
+                    String oldKey = key;
+                    key = randChars();
+                    if(debug) System.out.println("duplicate detected changed from " + oldKey + " to " + key);
+                }
+                table.get(i).put(key, randChars());
             }
         }
     }
     static void displayTable() {
         for (int i = 0; i < rowTable; i++) {
-            for (int j = 0; j < table.get(i).size(); j++) {
-                System.out.print(table.get(i).get(j) + "   ");
-            }
+            table.get(i).forEach((key, value) ->System.out.print(key + "  " + value + "    "));
             System.out.println("");
         }
     }
@@ -153,6 +171,8 @@ public class Main {
         System.out.println("7: Exit");
     }
 
+
+    /*
     static void userInputDimensionValid(UserInputDimensions userinput) {
         //TODO please use the other Input validation function
         //temporary fix make it a while loop until it gives a valid input
@@ -181,7 +201,7 @@ public class Main {
         }
         
     }
-
+    */
     
     
     static void searchTable(String toSearch) {
@@ -208,17 +228,66 @@ public class Main {
                             isOccurred = true;
                         }
                     }
-                    
-                        
-
                 }
-                
             }
         }
         System.out.println(instance + " Occurence/s at " + instanceLocation);        
     }
-    static void editTable(String toReplace, int row, int col) {
 
+    static void searchTable(){
+        
+        int instance = 0;
+        String instanceLocation = "";
+        boolean isInputValid = false;
+        while (!isInputValid) {
+            System.out.print("What are we searching for (key, value, both): ");
+            String userInput = scanner.nextLine().toUpperCase();
+            if(userInput.isEmpty()){
+                System.out.println("Please input a command");
+                continue;
+            }
+            if(!(userInput.equals(SearchTarget.KEY) || userInput.equals(SearchTarget.VALUE) || userInput.equals(SearchTarget.BOTH))){
+                System.out.println("please enter a valid command (key, value, or both)");
+                continue;
+            }
+            if(userInput.equals(SearchTarget.KEY) || userInput.equals(SearchTarget.VALUE)){
+                System.out.print("String to search: ");
+                String userChoice = scanner.nextLine();
+                if(userChoice.length() > 3) {
+                    System.out.println("Invalid length please have a maximum of 3 characters");
+                    continue;
+                }
+            }else if(userInput.equals(SearchTarget.BOTH)){
+                
+            }
+        }
+        
+        for (int i = 0; i < rowTable; i++) {
+            for (int j = 0; j < colTable; j++) {
+                boolean isOccurred = false;
+                for(int k = 0; k < 3; k++) {
+                    
+                    if(toSearchLen+k > 3) {
+                        //System.out.println("debug: break");                        
+                        break;
+                    }
+                    if(table.get(i).get(j).substring(k, toSearchLen+k).equals(toSearch)) {
+                        instance++;
+                        if(!isOccurred) {
+                            instanceLocation += "[" + i + "," + j + "]";
+                            isOccurred = true;
+                        }
+                    }
+                }
+            }
+        }
+        System.out.println(instance + " Occurence/s at " + instanceLocation);        
+    }
+
+
+    /* 
+    static void editTable(String toReplace, int row, int col) {
+        //key, value, or both
         if(toReplace.length() != 3) {
             System.out.println("Invalid length please input a word with a maximum of 3 characters");
             return;
@@ -235,6 +304,7 @@ public class Main {
         table.get(row).set(col, toReplace);
         System.out.println(" " + table.get(row).get(col));
     }
+    
     static void addRow(int numOfCell){
         
         table.add(new ArrayList<>());
@@ -243,9 +313,9 @@ public class Main {
         }
         rowTable++;
     }
-    static void sort(int rowToSort, SortOrderType order){
+    static void sort(int rowToSort, SortOrder order){
         List<String> row = new ArrayList<>();
-        if(order.equals(SortOrderType.ASC)){
+        if(order.equals(SortOrder.ASC)){
             row = table.get(rowToSort).stream()
                                     .map( c ->{
                                         char[] chars = c.toCharArray();
@@ -256,7 +326,7 @@ public class Main {
                                     .collect(Collectors.toList());
             table.set(rowToSort, row);
         }
-        else if((order.equals(SortOrderType.DESC))){
+        else if((order.equals(SortOrder.DESC))){
             row = table.get(rowToSort).stream()
                                     .map( c ->{
                                         char[] chars = c.toCharArray();
@@ -304,6 +374,7 @@ public class Main {
         }
         return userInputInt;
     }
+    */
     static String getFileNameInput(String inputFileName) {
         /*
          * To test
@@ -345,19 +416,19 @@ public class Main {
         }
         return inputFileName;
     }
-    static SortOrderType getSortOrderInput(){
+    static SortOrder getSortOrderInput(){
         String userInput="";
-        SortOrderType order = SortOrderType.ASC;
+        SortOrder order = SortOrder.ASC;
         boolean isValid = false;
         while (!isValid) {
             System.out.print("sort order (ASC or DESC): ");
             userInput = scanner.nextLine().toUpperCase();
-            if(userInput.toUpperCase().equals(SortOrderType.ASC.toString())){
+            if(userInput.toUpperCase().equals(SortOrder.ASC.toString())){
                 isValid=true;
-                order = SortOrderType.ASC;
-            }else if(userInput.toUpperCase().equals(SortOrderType.DESC.toString())){
+                order = SortOrder.ASC;
+            }else if(userInput.toUpperCase().equals(SortOrder.DESC.toString())){
                 isValid=true;
-                order = SortOrderType.DESC;
+                order = SortOrder.DESC;
             }
             else{
                 System.out.println("Please input either ASC or DESC");
@@ -370,10 +441,11 @@ public class Main {
     }
 
     public static void main(String[] args) {
+        /* 
         fileName = args.length > 0 ?  getFileNameInput(args[0]) : getFileNameInput("");
         table = fileReaderUtility();
         displayTable();
-
+        */
         UserInputDimensions userinputdimension = new UserInputDimensions();
 
         boolean exit = true;
@@ -390,28 +462,28 @@ public class Main {
                     break;
                 case "2":
                     //edit
-                    userInputDimensionValid(userinputdimension);
+                    //userInputDimensionValid(userinputdimension);
                     System.out.print("Input text to replaced: ");
                     userInput = scanner.nextLine();
-                    editTable(userInput, userinputdimension.row, userinputdimension.col);
-                    fileWriterUtility();
+                    //editTable(userInput, userinputdimension.row, userinputdimension.col);
+                    //fileWriterUtility();
                     break;
                 case "3":
                     //add row
                     System.out.print("How Many cells: ");
-                    int numOfCell = getNumInput(NumberType.VALID_NUM);
-                    addRow(numOfCell);
+                    //int numOfCell = getNumInput(NumberType.VALID_NUM);
+                    //addRow(numOfCell);
                     displayTable();
-                    fileWriterUtility();
+                    //fileWriterUtility();
                     break;
                 case "4":
                     //sort
                     System.out.print("Row to sort(0 - "+(rowTable-1) + "): ");
-                    int rowToSort = getNumInput(NumberType.VALID_ROW_NUM);
-                    SortOrderType order = getSortOrderInput();
-                    sort(rowToSort, order);
+                    //int rowToSort = getNumInput(NumberType.VALID_ROW_NUM);
+                    SortOrder order = getSortOrderInput();
+                    //sort(rowToSort, order);
                     displayTable();
-                    fileWriterUtility();
+                    //fileWriterUtility();
                     break;
                 case "5":
                     //print
@@ -419,12 +491,16 @@ public class Main {
                     break;
                 case "6":
                     //reset
-                    userInputDimensionValid(userinputdimension);
-                    rowTable = userinputdimension.row;
-                    colTable = userinputdimension.col;
+                    //userInputDimensionValid(userinputdimension);
+                    // rowTable = userinputdimension.row;
+                    // colTable = userinputdimension.col;
+
+                    rowTable = 5; //remove later
+                    colTable = 5;
+
                     genTable();
                     displayTable();
-                    fileWriterUtility();
+                    //fileWriterUtility();
                     break;
                 case "7":
                     //exit
