@@ -25,76 +25,84 @@ class UserInputDimensions {
 public class Main {    
     public static int rowTable;
     public static int colTable;
-    public static List<Map<String, String>> table;
+    public static List<LinkedHashMap<String, String>> table;
     public static String fileName;
     public static boolean debug = true;
     private static final Scanner scanner = new Scanner(System.in);
 
 
-    /* 
-    static List<Map<String, String>> fileReaderUtility(){
-        List<Map<String, String>> tempTable;
-        if(fileName.trim().isEmpty()){
-            System.out.println("Please enter a file name");
-            return table;
-        }
-        try {
-            File file = new File(fileName);
+    
+    static void fileReaderUtility(){
+        List<LinkedHashMap<String, String>> tempTable = new ArrayList<>();
+        List<String> unFilteredFileContent;
+        
+            if(fileName.trim().isEmpty()){
+                System.out.println("Please enter a file name");
+                return;
+            }
+            try {
+                File file = new File(fileName);
+                
+                if(!file.exists()) {
+                    System.out.println("File Doesn't exist");
+                    return;
+                }
+                if(!file.canRead()) {
+                    System.out.println("Can't read file please change permission");
+                    return;
+                }
+
+                unFilteredFileContent = Files.readAllLines(Paths.get(fileName));
             
-            if(!file.exists()) {
-                System.out.println("File Doesn't exist");
-                return table; 
-            }
-            if(!file.canRead()) {
-                System.out.println("Can't read file please change permission");
-                return table;
-            }
+                //System.out.println("unfiltered " + unFilteredFileContent);
+                if(unFilteredFileContent.isEmpty()){
+                    System.out.println("File is empty please put elements in the file");
+                    return;
+                }
+                rowTable = unFilteredFileContent.size();
 
-            List<String> unFilteredFileContent = Files.readAllLines(Paths.get(fileName));
-            //System.out.println("unfiltered " + unFilteredFileContent);
-            if(unFilteredFileContent.isEmpty()){
-                System.out.println("File is empty please put elements in the file");
-                return table;
-            }
-            int rowLength = unFilteredFileContent.get(0).length();
+                tempTable = new ArrayList<LinkedHashMap<String, String>>();
 
-            rowTable = unFilteredFileContent.size();
-            colTable =  ((rowLength-1) / 3)-1;
-            if(colTable <= -1) colTable = 0;
-            if(debug) System.out.println("coltable: " + colTable);
-            tempTable = new ArrayList<Map<String, String>>();
+                if (debug) System.out.println("debug: unfilteredfielcontent size" + unFilteredFileContent.size());
+                for(int i = 0; i < unFilteredFileContent.size(); i++){
+                    tempTable.add(new LinkedHashMap<>());
+                    String row = unFilteredFileContent.get(i);
+                    if (debug) System.out.println("debug: length = " + row.length());
+                    if (debug) System.out.println("debug: charrow value: " + row);
 
-            if (debug) System.out.println("debug: unfilteredfielcontent size" + unFilteredFileContent.size());
-            for(int i = 0; i < unFilteredFileContent.size(); i++){
-                tempTable.add(new HashMap<>());
-                String charRow = unFilteredFileContent.get(i);
-                if (debug) System.out.println("debug: length = " + charRow.length());
-                if (debug) System.out.println("debug: charrow value: " + charRow);
+                    for(int j = 0; j < row.length(); j= j+8){
+                        if (debug) System.out.println("debug: i = " + i);
+                        if (debug) System.out.println("debug: j = " + j);
+                        if(j+6 >= row.length()) {
+                                String key = ""+row.charAt(j) +row.charAt(j+1) + row.charAt(j+2);
+                                String value = ""+ row.charAt(j+4)+ row.charAt(j+5)+ row.charAt(j+6);
+                            tempTable.get(i).put(key, value);
+                            break;
+                        };
 
-                for(int j = 0; j < charRow.length(); j +=4){
-                    if (debug) System.out.println("debug: i = " + i);
-                    if (debug) System.out.println("debug: j = " + j);
-                    if(j+2>= charRow.length()) {
-                        System.out.println("invalid table check element count (3 elements per cell)");
-                    };
-                    tempTable.get(i).put((charRow.charAt(j) + "" +charRow.charAt(j+1) + "" + charRow.charAt(j+2)));
+                        if((row.charAt(j+3) != ' ' || (j+7 > row.length() && row.charAt(j+7) != ' '))){
+                            System.out.println("Invalid table due to no space between elements (every 3 elements should have a space)");
+                            return;
+                        }
+                        String key = ""+row.charAt(j) +row.charAt(j+1) + row.charAt(j+2);
+                        String value = ""+ row.charAt(j+4)+ row.charAt(j+5)+ row.charAt(j+6);
+                        tempTable.get(i).put(key, value);
+                        if(debug) System.out.println("key: " + key);
+                        if(debug) System.out.println("value: " + value);
 
-                    if( !(j+3 >= charRow.length()) && charRow.charAt(j+3) != ' '){
-                        System.out.println("Invalid table due to no space between elements (every 3 elements should have a space)");
-                        return table;
+
+                        
                     }
                 }
+            }catch(Exception e){
+                System.out.println("invalid table format please check your table");
+                return;
             }
-        }catch(NumberFormatException e){
-            System.out.println("invalid col length please check your table");
-            return table;
-        }catch(Exception e){
-            System.out.println(e);
-            return table;
-        }
-
-        return tempTable;
+        table = tempTable;
+        
     }
+
+    
     static void fileWriterUtility(){
         if(fileName.trim().isEmpty()){
             System.out.println("Please enter a file name");
@@ -111,22 +119,24 @@ public class Main {
                 return;
             }
             List<String> lines = new ArrayList<>();
-            for (List<String> list : table) {
-                lines.add(String.join(" ", list));
+            for(int i =0; i < rowTable; i++){
+                StringBuilder line = new StringBuilder();
+                for (Map.Entry<String, String> entry : table.get(i).entrySet()) {
+                    line.append(" ").append(entry.getKey()).append(" ").append(entry.getValue());
+                }
+                lines.add(line.toString().trim());
             }
+
             Files.write(Paths.get(fileName), lines);
             
         } catch (Exception e) {
-            // TODO: handle exception
+            System.out.println("Something went wrong when writing to a file");
         }
     }
-
-    */
-    
     static String randChars() {
         String aschii = "";
-        //32 - 126 aschi char
-        int min = 32;
+        //33 - 126 aschi char
+        int min = 33;
         int max = 126;
         for (int i = 0; i < 3; i++) {
             int randomNum = (int)(Math.random() * (max - min + 1)) + min;
@@ -135,9 +145,9 @@ public class Main {
         return aschii;
     }
     static void genTable() {
-        table = new ArrayList<Map<String, String>>();
+        table = new ArrayList<LinkedHashMap<String, String>>();
         for (int i = 0; i < rowTable; i++) {
-            table.add(i, new HashMap<String, String>());
+            table.add(i, new LinkedHashMap<String, String>());
             for (int j = 0; j < colTable; j++) {
                 String key  = randChars();
 
@@ -172,7 +182,7 @@ public class Main {
     }
 
 
-    /*
+    
     static void userInputDimensionValid(UserInputDimensions userinput) {
         //TODO please use the other Input validation function
         //temporary fix make it a while loop until it gives a valid input
@@ -201,150 +211,309 @@ public class Main {
         }
         
     }
-    */
     
-    
-    static void searchTable(String toSearch) {
-        int instance = 0;
-        String instanceLocation = "";
-        int toSearchLen = toSearch.length();
-        if(toSearchLen > 3) {
-            System.out.println("Invalid length please have a maximum of 3 characters");
-            return;
-        }
-        for (int i = 0; i < rowTable; i++) {
-            for (int j = 0; j < colTable; j++) {
-                boolean isOccurred = false;
-                for(int k = 0; k < 3; k++) {
-                    
-                    if(toSearchLen+k > 3) {
-                        //System.out.println("debug: break");                        
-                        break;
-                    }
-                    if(table.get(i).get(j).substring(k, toSearchLen+k).equals(toSearch)) {
-                        instance++;
-                        if(!isOccurred) {
-                            instanceLocation += "[" + i + "," + j + "]";
-                            isOccurred = true;
-                        }
-                    }
-                }
-            }
-        }
-        System.out.println(instance + " Occurence/s at " + instanceLocation);        
-    }
+
 
     static void searchTable(){
-        
+        //TODO "BOTH" not implemented properly it only checks user input but no search
         int instance = 0;
         String instanceLocation = "";
         boolean isInputValid = false;
+        String userInput ="";
         while (!isInputValid) {
             System.out.print("What are we searching for (key, value, both): ");
-            String userInput = scanner.nextLine().toUpperCase();
+            userInput = scanner.nextLine().toUpperCase();
             if(userInput.isEmpty()){
                 System.out.println("Please input a command");
                 continue;
             }
-            if(!(userInput.equals(SearchTarget.KEY) || userInput.equals(SearchTarget.VALUE) || userInput.equals(SearchTarget.BOTH))){
-                System.out.println("please enter a valid command (key, value, or both)");
+            if(!(userInput.equals(SearchTarget.KEY.toString()) || userInput.equals(SearchTarget.VALUE.toString()) || userInput.equals(SearchTarget.BOTH.toString()))) {
+                System.out.println("Invalid answer, (Choose from Key, Value, Both)!");
                 continue;
             }
-            if(userInput.equals(SearchTarget.KEY) || userInput.equals(SearchTarget.VALUE)){
-                System.out.print("String to search: ");
-                String userChoice = scanner.nextLine();
-                if(userChoice.length() > 3) {
-                    System.out.println("Invalid length please have a maximum of 3 characters");
+
+
+            if(userInput.equals(SearchTarget.KEY.toString())) {
+                System.out.print("key to search: ");
+                String key = scanner.nextLine();
+                int toSearchLen = key.length();
+                int rowIteration=0;
+                int colIteration =0;
+                for (Map<String,String> map : table) {
+                    colIteration=0;
+                    for (String mapKey: map.keySet()) {
+                        boolean isOccurred = false;
+                        for(int k = 0; k < 3; k++){
+                            if(toSearchLen+k > 3) {
+                                if(debug) System.out.println("debug: break");                        
+                                break;
+                            }
+                            if(mapKey.substring(k, toSearchLen+k).equals(key)) {
+                                instance++;
+                                if(!isOccurred) {
+                                    instanceLocation += "[" + rowIteration + "," + colIteration + "]";
+                                    isOccurred = true;
+                                }
+                                if(debug) System.out.println("occurrance at: " + rowIteration + " " +colIteration);                        
+
+
+                            }
+                        
+                        }
+                        colIteration++;
+
+                    }
+                    rowIteration++;
+
+                }
+                System.out.println(instance + " Occurence/s at " + instanceLocation);
+                return;
+            }else if(userInput.equals(SearchTarget.VALUE.toString())) {
+                System.out.print("value to search: ");
+                String value = scanner.nextLine();
+
+                int toSearchLen = value.length();
+                int rowIteration=0;
+                int colIteration =0;
+                for (Map<String,String> map : table) {
+                    Collection<String> mapValues = map.values();
+                    colIteration=0;
+                    for (String mapValue: mapValues) {
+                        boolean isOccurred = false;
+
+                        for(int k = 0; k < 3; k++){
+                            if(toSearchLen+k > 3) {
+                                if(debug) System.out.println("debug: break");                        
+                                break;
+                            }
+                            if(mapValue.substring(k, toSearchLen+k).equals(value)) {
+                                instance++;
+                                if(!isOccurred) {
+                                    instanceLocation += "[" + rowIteration + "," + colIteration + "]";
+                                    isOccurred = true;
+                                }
+
+                            }
+                        }
+                        colIteration++;
+
+                    }
+                    rowIteration++;
+
+                }
+                System.out.println(instance + " Occurence/s at " + instanceLocation);
+                return;
+            } else if(userInput.equals(SearchTarget.BOTH.toString())) {
+                //TODO not yet implemented
+                //only checks and validates userinput
+
+                System.out.print("Key to search");
+                String key = scanner.nextLine();
+
+
+                System.out.print("value to search");
+                String value = scanner.nextLine();
+
+
+                isInputValid=true;
+            }else {
+                System.out.println("Error no User Input found");
+                continue;
+            }
+        }
+        
+        
+             
+    }
+    static void editTable() {
+        boolean isInputValid = false;
+        int rowInt = 0;
+        int colInt = 0;
+        while (!isInputValid) {
+            System.out.print("row to edit: ");
+            String rowInput =  scanner.nextLine();
+            System.out.print("col to edit: ");
+            String colInput =  scanner.nextLine();
+            try {
+                rowInt = Integer.parseInt(rowInput);
+                colInt = Integer.parseInt(colInput);
+            } catch (NumberFormatException e) {
+                System.out.println("please enter a valid number");
+                continue;
+            }
+            if(0 > rowInt || rowInt >= rowTable) {
+                System.out.println("out of bounce please input a valid row from 0 - " + (rowTable-1));
+                continue;
+            }
+            int colLen = table.get(rowInt).size();
+            if(0 > colInt || colInt >= colLen) {
+                System.out.println("out of bounce please input a valid col from 0 - " + (colLen-1));
+                continue;
+            }
+
+
+            System.out.print("What are we editing (Key, Value, Both) ");
+            String choice = scanner.nextLine().toUpperCase();
+            if(choice.isEmpty()){
+                System.out.println("Please input a command");
+                continue;
+            }
+            if(!(choice.equals(SearchTarget.KEY.toString()) || choice.equals(SearchTarget.VALUE.toString()) || choice.equals(SearchTarget.BOTH.toString()))) {
+                System.out.println("Invalid answer, (Choose from Key, Value, Both)!");
+                continue;
+            }
+
+            
+
+            if(choice.equals(SearchTarget.KEY.toString())) {
+                System.out.print("key to replace: ");
+                String toReplace = scanner.nextLine();
+                if(toReplace.length() != 3) {
+                    System.out.println("Invalid length please input a word with a maximum of 3 characters");
                     continue;
                 }
-            }else if(userInput.equals(SearchTarget.BOTH)){
-                
-            }
-        }
-        
-        for (int i = 0; i < rowTable; i++) {
-            for (int j = 0; j < colTable; j++) {
-                boolean isOccurred = false;
-                for(int k = 0; k < 3; k++) {
-                    
-                    if(toSearchLen+k > 3) {
-                        //System.out.println("debug: break");                        
-                        break;
-                    }
-                    if(table.get(i).get(j).substring(k, toSearchLen+k).equals(toSearch)) {
-                        instance++;
-                        if(!isOccurred) {
-                            instanceLocation += "[" + i + "," + j + "]";
-                            isOccurred = true;
-                        }
-                    }
+                if(table.get(rowInt).containsKey(toReplace)){
+                    System.out.println("Key already exist for that row please input another one");
+                    continue;
                 }
+
+                    
+                int i =0;
+                LinkedHashMap<String, String> updatedRow = new LinkedHashMap<>();
+                
+                for(Map.Entry<String, String> item : table.get(rowInt).entrySet()) {
+                    if(i == colInt){
+                        System.out.println("Replacing column " + i + " key: " + item.getKey() + " to " + toReplace);
+                        updatedRow.put(toReplace, item.getValue());
+                        isInputValid = true;
+                    }else{
+                        updatedRow.put(item.getKey(), item.getValue());
+                    }
+                    if(debug) System.out.println("debug: " +updatedRow);
+
+                    i++;
+                }
+                table.set(rowInt, updatedRow);
+
+
+            }else if(choice.equals(SearchTarget.VALUE.toString())) {
+                System.out.print("key to replace: ");
+                String toReplace = scanner.nextLine();
+                if(toReplace.length() != 3) {
+                    System.out.println("Invalid length please input a word with a maximum of 3 characters");
+                    continue;
+                }
+
+                int i =0;
+                
+                for(Map.Entry<String, String> item : table.get(rowInt).entrySet()) {
+                    if(i == colInt){
+                        System.out.println("Replacing column " + i + " key: " + item.getKey() + " to " + toReplace);
+                        table.get(rowInt).replace(item.getKey(), toReplace);
+                        isInputValid = true;
+                    }
+                    i++;
+                }   
+            }else if(choice.equals(SearchTarget.BOTH.toString())) {
+                System.out.print("key and value to replace (space seperated): ");
+                String toReplace = scanner.nextLine();
+                if(toReplace.length() != 7) {
+                    System.out.println("Invalid length please input a word with a maximum of 7 characters (space included)");
+                    continue;
+                }
+                if(toReplace.charAt(3) != ' '){
+                    System.out.println("Please Input a space in between");
+                }
+                String key = toReplace.substring(0, 3);
+                String value = toReplace.substring(4, 7);
+                if(debug){
+                    System.out.println("key: " + key + " value " + value);
+                }
+                if(table.get(rowInt).containsKey(key)){
+                    System.out.println("Key already exist for that row please input another one");
+                    continue;
+                }
+
+                int i =0;
+                
+                LinkedHashMap<String, String> updatedRow = new LinkedHashMap<>();
+                
+                for(Map.Entry<String, String> item : table.get(rowInt).entrySet()) {
+                    if(i == colInt){
+                        System.out.println("Replacing column " + i + " key: " + item.getKey() + " to " + key);
+                        System.out.println("Replacing column " + i + " value: " + item.getValue() + " to " + value);
+                        updatedRow.put(key, value);
+                        isInputValid = true;
+                    }else{
+                        updatedRow.put(item.getKey(), item.getValue());
+                    }
+                    if(debug) System.out.println("debug: " +updatedRow);
+
+                    i++;
+                }
+                table.set(rowInt, updatedRow);   
             }
         }
-        System.out.println(instance + " Occurence/s at " + instanceLocation);        
     }
-
-
-    /* 
-    static void editTable(String toReplace, int row, int col) {
-        //key, value, or both
-        if(toReplace.length() != 3) {
-            System.out.println("Invalid length please input a word with a maximum of 3 characters");
-            return;
-        }
-        if(0 > row || row >= rowTable) {
-            System.out.println("out of bounce please input a valid row from 0 - " + (rowTable-1));
-            return;
-        }
-        if(0 > col || col >= colTable) {
-            System.out.println("out of bounce please input a valid col from 0 - " + (colTable-1));
-            return;
-        }
-        System.out.print(table.get(row).get(col));
-        table.get(row).set(col, toReplace);
-        System.out.println(" " + table.get(row).get(col));
-    }
-    
     static void addRow(int numOfCell){
         
-        table.add(new ArrayList<>());
-        for(int i =0; i < numOfCell; i++){
-            table.get(rowTable).add(randChars());
+        table.add(new LinkedHashMap<String, String>());
+        for (int j = 0; j < numOfCell; j++) {
+            String key  = randChars();
+
+            while(table.get(rowTable-1).containsKey(key)) {
+                String oldKey = key;
+                key = randChars();
+                if(debug) System.out.println("duplicate detected changed from " + oldKey + " to " + key);
+            }
+            table.get(rowTable).put(key, randChars());
         }
         rowTable++;
     }
     static void sort(int rowToSort, SortOrder order){
-        List<String> row = new ArrayList<>();
+
+        boolean isSortFailed = false;
+        LinkedHashMap<String, String> row = new LinkedHashMap<>();
         if(order.equals(SortOrder.ASC)){
-            row = table.get(rowToSort).stream()
-                                    .map( c ->{
-                                        char[] chars = c.toCharArray();
-                                        Arrays.sort(chars);
-                                        return new String(chars);
-                                    })
-                                    .sorted(Comparator.naturalOrder())
-                                    .collect(Collectors.toList());
-            table.set(rowToSort, row);
+            List<String> updatedRow = new ArrayList<>();
+            for (Map.Entry<String,String> item : table.get(rowToSort).entrySet()) {
+                updatedRow.add(item.getKey()+item.getValue());
+            }
+            Collections.sort(updatedRow);
+            for (String combinedKeyValue : updatedRow) {
+                if(row.containsKey(combinedKeyValue.substring(0, 3))){
+                    System.out.println("Sort fail due to detecting the same key");
+                    isSortFailed = true;
+                    break;
+                }else{
+                    row.put(combinedKeyValue.substring(0, 3),combinedKeyValue.substring(3, 6) );
+                    if(debug) System.out.println("asc: row " + row);
+                }
+            }
+
         }
         else if((order.equals(SortOrder.DESC))){
-            row = table.get(rowToSort).stream()
-                                    .map( c ->{
-                                        char[] chars = c.toCharArray();
-                                        Character[] charObj = new Character[chars.length];
-                                        for(int i =0; i < chars.length; i++){
-                                            charObj[i] = chars[i];
-                                        }
-                                        Arrays.sort(charObj, Collections.reverseOrder());
-                                        return new String(chars);
-                                    })
-                                    .sorted(Comparator.reverseOrder())
-                                    .collect(Collectors.toList());
-            
+              List<String> updatedRow = new ArrayList<>();
+            for (Map.Entry<String,String> item : table.get(rowToSort).entrySet()) {
+                updatedRow.add(item.getKey()+item.getValue());
+            }
+            Collections.sort(updatedRow, Collections.reverseOrder());
+            for (String combinedKeyValue : updatedRow) {
+                if(row.containsKey(combinedKeyValue.substring(0, 3))){
+                    System.out.println("Sort fail due to detecting the same key");
+                    isSortFailed = true;
+                    break;
+                }else{
+                    row.put(combinedKeyValue.substring(0, 3),combinedKeyValue.substring(3, 6) );
+                    if(debug) System.out.println("desc: row " + row);
+                }
+            }
         }
-        table.set(rowToSort, row);
+        if(!isSortFailed) {
+            table.set(rowToSort, row);   
+
+        }
     }
-
-
     
     static int getNumInput(NumberType type){
         String userInput;
@@ -373,8 +542,7 @@ public class Main {
             }
         }
         return userInputInt;
-    }
-    */
+    } 
     static String getFileNameInput(String inputFileName) {
         /*
          * To test
@@ -441,11 +609,14 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        /* 
-        fileName = args.length > 0 ?  getFileNameInput(args[0]) : getFileNameInput("");
-        table = fileReaderUtility();
+        
+        while (table == null) {
+            fileName = args.length > 0 ?  getFileNameInput(args[0]) : getFileNameInput("");
+            fileReaderUtility();
+        }
+        
         displayTable();
-        */
+        
         UserInputDimensions userinputdimension = new UserInputDimensions();
 
         boolean exit = true;
@@ -456,34 +627,29 @@ public class Main {
             switch (userInput) {
                 case "1":
                     //search
-                    System.out.print("To Search: ");
-                    userInput = scanner.nextLine();
-                    searchTable(userInput);
+                    searchTable();
                     break;
                 case "2":
                     //edit
-                    //userInputDimensionValid(userinputdimension);
-                    System.out.print("Input text to replaced: ");
-                    userInput = scanner.nextLine();
-                    //editTable(userInput, userinputdimension.row, userinputdimension.col);
-                    //fileWriterUtility();
+                    editTable();
+                    fileWriterUtility();
                     break;
                 case "3":
                     //add row
                     System.out.print("How Many cells: ");
-                    //int numOfCell = getNumInput(NumberType.VALID_NUM);
-                    //addRow(numOfCell);
+                    int numOfCell = getNumInput(NumberType.VALID_NUM);
+                    addRow(numOfCell);
                     displayTable();
-                    //fileWriterUtility();
+                    fileWriterUtility();
                     break;
                 case "4":
                     //sort
                     System.out.print("Row to sort(0 - "+(rowTable-1) + "): ");
-                    //int rowToSort = getNumInput(NumberType.VALID_ROW_NUM);
+                    int rowToSort = getNumInput(NumberType.VALID_ROW_NUM);
                     SortOrder order = getSortOrderInput();
-                    //sort(rowToSort, order);
+                    sort(rowToSort, order);
                     displayTable();
-                    //fileWriterUtility();
+                    fileWriterUtility();
                     break;
                 case "5":
                     //print
@@ -491,16 +657,13 @@ public class Main {
                     break;
                 case "6":
                     //reset
-                    //userInputDimensionValid(userinputdimension);
-                    // rowTable = userinputdimension.row;
-                    // colTable = userinputdimension.col;
-
-                    rowTable = 5; //remove later
-                    colTable = 5;
+                    userInputDimensionValid(userinputdimension);
+                    rowTable = userinputdimension.row;
+                    colTable = userinputdimension.col;
 
                     genTable();
                     displayTable();
-                    //fileWriterUtility();
+                    fileWriterUtility();
                     break;
                 case "7":
                     //exit
