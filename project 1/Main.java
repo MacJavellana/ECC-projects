@@ -101,8 +101,6 @@ public class Main {
         table = tempTable;
         
     }
-
-    
     static void fileWriterUtility(){
         if(fileName.trim().isEmpty()){
             System.out.println("Please enter a file name");
@@ -182,7 +180,8 @@ public class Main {
     }
 
 
-    
+
+
     static void userInputDimensionValid(UserInputDimensions userinput) {
         //TODO please use the other Input validation function
         //temporary fix make it a while loop until it gives a valid input
@@ -227,7 +226,9 @@ public class Main {
                 System.out.println("Please input a command");
                 continue;
             }
-            if(!(userInput.equals(SearchTarget.KEY.toString()) || userInput.equals(SearchTarget.VALUE.toString()) || userInput.equals(SearchTarget.BOTH.toString()))) {
+            if(!(userInput.equals(SearchTarget.KEY.toString()) || 
+            userInput.equals(SearchTarget.VALUE.toString()) || 
+            userInput.equals(SearchTarget.BOTH.toString()))) {
                 System.out.println("Invalid answer, (Choose from Key, Value, Both)!");
                 continue;
             }
@@ -254,17 +255,13 @@ public class Main {
                                     instanceLocation += "[" + rowIteration + "," + colIteration + "]";
                                     isOccurred = true;
                                 }
-                                if(debug) System.out.println("occurrance at: " + rowIteration + " " +colIteration);                        
-
-
+                                if(debug) System.out.println("occurrance at: " + rowIteration + " " +colIteration);
                             }
                         
                         }
                         colIteration++;
-
                     }
                     rowIteration++;
-
                 }
                 System.out.println(instance + " Occurence/s at " + instanceLocation);
                 return;
@@ -321,19 +318,21 @@ public class Main {
                 continue;
             }
         }
-        
-        
-             
     }
+
+
+
     static void editTable() {
         boolean isInputValid = false;
         int rowInt = 0;
         int colInt = 0;
+        
         while (!isInputValid) {
             System.out.print("row to edit: ");
-            String rowInput =  scanner.nextLine();
+            String rowInput = scanner.nextLine();
             System.out.print("col to edit: ");
-            String colInput =  scanner.nextLine();
+            String colInput = scanner.nextLine();
+            
             try {
                 rowInt = Integer.parseInt(rowInput);
                 colInt = Integer.parseInt(colInput);
@@ -341,126 +340,149 @@ public class Main {
                 System.out.println("please enter a valid number");
                 continue;
             }
-            if(0 > rowInt || rowInt >= rowTable) {
-                System.out.println("out of bounce please input a valid row from 0 - " + (rowTable-1));
+            
+            if (0 > rowInt || rowInt >= rowTable) {
+                System.out.println("out of bounds please input a valid row from 0 - " + (rowTable - 1));
                 continue;
             }
+            
             int colLen = table.get(rowInt).size();
-            if(0 > colInt || colInt >= colLen) {
-                System.out.println("out of bounce please input a valid col from 0 - " + (colLen-1));
+            if (0 > colInt || colInt >= colLen) {
+                System.out.println("out of bounds please input a valid col from 0 - " + (colLen - 1));
                 continue;
             }
-
-
-            System.out.print("What are we editing (Key, Value, Both) ");
+            
+            System.out.print("What are we editing (Key, Value, Both): ");
             String choice = scanner.nextLine().toUpperCase();
-            if(choice.isEmpty()){
+            
+            if (choice.isEmpty()) {
                 System.out.println("Please input a command");
                 continue;
             }
-            if(!(choice.equals(SearchTarget.KEY.toString()) || choice.equals(SearchTarget.VALUE.toString()) || choice.equals(SearchTarget.BOTH.toString()))) {
+            
+            if (!(choice.equals(SearchTarget.KEY.toString()) || 
+                choice.equals(SearchTarget.VALUE.toString()) || 
+                choice.equals(SearchTarget.BOTH.toString()))) {
                 System.out.println("Invalid answer, (Choose from Key, Value, Both)!");
                 continue;
             }
-
             
-
-            if(choice.equals(SearchTarget.KEY.toString())) {
-                System.out.print("key to replace: ");
-                String toReplace = scanner.nextLine();
-                if(toReplace.length() != 3) {
-                    System.out.println("Invalid length please input a word with a maximum of 3 characters");
-                    continue;
-                }
-                if(table.get(rowInt).containsKey(toReplace)){
-                    System.out.println("Key already exist for that row please input another one");
-                    continue;
-                }
-
-                    
-                int i =0;
-                LinkedHashMap<String, String> updatedRow = new LinkedHashMap<>();
-                
-                for(Map.Entry<String, String> item : table.get(rowInt).entrySet()) {
-                    if(i == colInt){
-                        System.out.println("Replacing column " + i + " key: " + item.getKey() + " to " + toReplace);
-                        updatedRow.put(toReplace, item.getValue());
-                        isInputValid = true;
-                    }else{
-                        updatedRow.put(item.getKey(), item.getValue());
-                    }
-                    if(debug) System.out.println("debug: " +updatedRow);
-
-                    i++;
-                }
-                table.set(rowInt, updatedRow);
-
-
-            }else if(choice.equals(SearchTarget.VALUE.toString())) {
-                System.out.print("key to replace: ");
-                String toReplace = scanner.nextLine();
-                if(toReplace.length() != 3) {
-                    System.out.println("Invalid length please input a word with a maximum of 3 characters");
-                    continue;
-                }
-
-                int i =0;
-                
-                for(Map.Entry<String, String> item : table.get(rowInt).entrySet()) {
-                    if(i == colInt){
-                        System.out.println("Replacing column " + i + " key: " + item.getKey() + " to " + toReplace);
-                        table.get(rowInt).replace(item.getKey(), toReplace);
-                        isInputValid = true;
-                    }
-                    i++;
-                }   
-            }else if(choice.equals(SearchTarget.BOTH.toString())) {
-                System.out.print("key and value to replace (space seperated): ");
-                String toReplace = scanner.nextLine();
-                if(toReplace.length() != 7) {
-                    System.out.println("Invalid length please input a word with a maximum of 7 characters (space included)");
-                    continue;
-                }
-                if(toReplace.charAt(3) != ' '){
-                    System.out.println("Please Input a space in between");
-                }
-                String key = toReplace.substring(0, 3);
-                String value = toReplace.substring(4, 7);
-                if(debug){
-                    System.out.println("key: " + key + " value " + value);
-                }
-                if(table.get(rowInt).containsKey(key)){
-                    System.out.println("Key already exist for that row please input another one");
-                    continue;
-                }
-
-                int i =0;
-                
-                LinkedHashMap<String, String> updatedRow = new LinkedHashMap<>();
-                
-                for(Map.Entry<String, String> item : table.get(rowInt).entrySet()) {
-                    if(i == colInt){
-                        System.out.println("Replacing column " + i + " key: " + item.getKey() + " to " + key);
-                        System.out.println("Replacing column " + i + " value: " + item.getValue() + " to " + value);
-                        updatedRow.put(key, value);
-                        isInputValid = true;
-                    }else{
-                        updatedRow.put(item.getKey(), item.getValue());
-                    }
-                    if(debug) System.out.println("debug: " +updatedRow);
-
-                    i++;
-                }
-                table.set(rowInt, updatedRow);   
-            }
+            // Use helper to edit the cell
+            isInputValid = editCellAtPosition(rowInt, colInt, choice);
         }
     }
-    static void addRow(int numOfCell){
+    static boolean editCellAtPosition(int rowInt, int colInt, String choice) {
+        if (choice.equals(SearchTarget.KEY.toString())) {
+            return editKey(rowInt, colInt);
+            
+        } else if (choice.equals(SearchTarget.VALUE.toString())) {
+            return editValue(rowInt, colInt);
+            
+        } else if (choice.equals(SearchTarget.BOTH.toString())) {
+            return editBoth(rowInt, colInt);
+        }
+        return false;
+    }
+    static boolean editKey(int rowInt, int colInt) {
+        System.out.print("key to replace: ");
+        String toReplace = scanner.nextLine();
         
+        if (toReplace.length() != 3) {
+            System.out.println("Invalid length please input a word with exactly 3 characters");
+            return false;
+        }
+        
+        if (table.get(rowInt).containsKey(toReplace)) {
+            System.out.println("Key already exists for that row please input another one");
+            return false;
+        }
+        
+        LinkedHashMap<String, String> updatedRow = new LinkedHashMap<>();
+        int i = 0;
+        
+        for (Map.Entry<String, String> item : table.get(rowInt).entrySet()) {
+            if (i == colInt) {
+                System.out.println("Replacing column " + i + " key: " + item.getKey() + " to " + toReplace);
+                updatedRow.put(toReplace, item.getValue());
+            } else {
+                updatedRow.put(item.getKey(), item.getValue());
+            }
+            i++;
+        }
+        
+        table.set(rowInt, updatedRow);
+        return true;
+    }
+    static boolean editValue(int rowInt, int colInt) {
+        System.out.print("value to replace: ");
+        String toReplace = scanner.nextLine();
+        
+        if (toReplace.length() != 3) {
+            System.out.println("Invalid length please input a word with exactly 3 characters");
+            return false;
+        }
+        
+        int i = 0;
+        for (Map.Entry<String, String> item : table.get(rowInt).entrySet()) {
+            if (i == colInt) {
+                System.out.println("Replacing column " + i + " value: " + item.getValue() + " to " + toReplace);
+                table.get(rowInt).replace(item.getKey(), toReplace);
+                return true;
+            }
+            i++;
+        }
+        return false;
+    }
+    static boolean editBoth(int rowInt, int colInt) {
+        System.out.print("key and value to replace (space separated): ");
+        String toReplace = scanner.nextLine();
+        
+        if (toReplace.length() != 7) {
+            System.out.println("Invalid length please input 7 characters (space included)");
+            return false;
+        }
+        
+        if (toReplace.charAt(3) != ' ') {
+            System.out.println("Please Input a space in between");
+            return false;
+        }
+        
+        String key = toReplace.substring(0, 3);
+        String value = toReplace.substring(4, 7);
+        
+        if (debug) {
+            System.out.println("key: " + key + " value: " + value);
+        }
+        
+        if (table.get(rowInt).containsKey(key)) {
+            System.out.println("Key already exists for that row please input another one");
+            return false;
+        }
+        
+        LinkedHashMap<String, String> updatedRow = new LinkedHashMap<>();
+        int i = 0;
+        
+        for (Map.Entry<String, String> item : table.get(rowInt).entrySet()) {
+            if (i == colInt) {
+                System.out.println("Replacing column " + i + " key: " + item.getKey() + " to " + key);
+                System.out.println("Replacing column " + i + " value: " + item.getValue() + " to " + value);
+                updatedRow.put(key, value);
+            } else {
+                updatedRow.put(item.getKey(), item.getValue());
+            }
+            i++;
+        }
+        
+        table.set(rowInt, updatedRow);
+        return true;
+    }
+
+
+
+    static void addRow(int numOfCell){
         table.add(new LinkedHashMap<String, String>());
         for (int j = 0; j < numOfCell; j++) {
             String key  = randChars();
-
             while(table.get(rowTable-1).containsKey(key)) {
                 String oldKey = key;
                 key = randChars();
