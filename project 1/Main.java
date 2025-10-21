@@ -180,39 +180,6 @@ public class Main {
     }
 
 
-
-
-    static void userInputDimensionValid(UserInputDimensions userinput) {
-        //TODO please use the other Input validation function
-        //temporary fix make it a while loop until it gives a valid input
-
-        boolean isInputValid = false;
-        while (!isInputValid) {
-            System.out.println("valid input (3x3, 4x4, 5x5, etc.)");
-            System.out.print("Location: ");
-            String userInput = scanner.nextLine();
-        
-            if(userInput.length() != 3) {
-                System.out.println("length must be 3 characters");
-                continue;
-            }
-            if(!(Character.toLowerCase(userInput.charAt(1)) == 'x')){
-                continue;
-            }
-            try{
-                userinput.row = Integer.parseInt(String.valueOf(userInput.charAt(0)));
-                userinput.col = Integer.parseInt(String.valueOf(userInput.charAt(2)));
-            }catch(NumberFormatException e) {
-                System.out.println("Invalid input please enter an integer (i.e. 3x3 or 4x4)");
-                continue;
-            }
-            break;
-        }
-        
-    }
-    
-
-
     static void searchTable(){
         //TODO "BOTH" not implemented properly it only checks user input but no search
         int instance = 0;
@@ -319,8 +286,6 @@ public class Main {
             }
         }
     }
-
-
 
     static void editTable() {
         boolean isInputValid = false;
@@ -477,8 +442,6 @@ public class Main {
         return true;
     }
 
-
-
     static void addRow(int numOfCell){
         table.add(new LinkedHashMap<String, String>());
         for (int j = 0; j < numOfCell; j++) {
@@ -537,6 +500,7 @@ public class Main {
         }
     }
     
+
     static int getNumInput(NumberType type){
         String userInput;
         boolean isValid = false;
@@ -629,6 +593,35 @@ public class Main {
         }
         return order;
     }
+    static void userInputDimensionValid(UserInputDimensions userinput) {
+        //TODO please use the other Input validation function
+        //temporary fix make it a while loop until it gives a valid input
+
+        boolean isInputValid = false;
+        while (!isInputValid) {
+            System.out.println("valid input (3x3, 4x4, 5x5, etc.)");
+            System.out.print("Location: ");
+            String userInput = scanner.nextLine();
+        
+            if(userInput.length() != 3) {
+                System.out.println("length must be 3 characters");
+                continue;
+            }
+            if(!(Character.toLowerCase(userInput.charAt(1)) == 'x')){
+                continue;
+            }
+            try{
+                userinput.row = Integer.parseInt(String.valueOf(userInput.charAt(0)));
+                userinput.col = Integer.parseInt(String.valueOf(userInput.charAt(2)));
+            }catch(NumberFormatException e) {
+                System.out.println("Invalid input please enter an integer (i.e. 3x3 or 4x4)");
+                continue;
+            }
+            break;
+        }
+        
+    }
+    
 
     public static void main(String[] args) {
         
