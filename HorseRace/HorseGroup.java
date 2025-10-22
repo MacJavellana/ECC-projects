@@ -1,5 +1,6 @@
 public enum HorseGroup {
     ADVANCED,
     INTERMEDIATE,
-    BEGINNER
+    BEGINNER,
+    DEFAULT
 }

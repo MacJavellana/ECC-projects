@@ -1,31 +1,33 @@
 import java.util.Random;
 
-public class Horse implements Runnable {
-    enum CONDITION {
-        HEALTHY,
-        NOT_HEALTHY
-    }
+public class Horse {
+    
     private String name;
     private String warCry;
     private int age;
-    private String condition;
-    private double speed;
+    private Condition condition;
+    private double speed = 0;
+    private HorseGroup horseGroup;
+    private int lap = 0;
+    private double distance;
 
-
-
-    private String getRandCondition() {
+    private Condition getRandCondition() {
         Random random = new Random();
-        return random.nextBoolean() ? CONDITION.HEALTHY.toString() : CONDITION.NOT_HEALTHY.toString();
+        return random.nextBoolean() ? Condition.HEALTHY : Condition.NOT_HEALTHY;
     }
     private int getRandSpeed(int min, int max){
         return (int)(Math.random() * (max - min + 1)) + min;
     }
 
-    public Horse(String name, String warCry, int age) {
+    public Horse(String name, String warCry, int age, double distance) {
         this.name = name;
         this.warCry = warCry;
         this.age = age;
         condition = getRandCondition();
+        horseGroup = HorseGroup.DEFAULT;
+        lap = 1;
+        this.distance = distance;
+
     }
 
 
@@ -33,15 +35,7 @@ public class Horse implements Runnable {
     public String finished(){
         return warCry;
     }
-    public void setSpeed(int generation){
-        HorseGroup horseGroup = null;
-        try {
-            horseGroup = HorseGroup.valueOf(condition);
-        } catch (Exception e) {
-            System.out.println("something went wrong horse group went to default");
-            horseGroup = HorseGroup.BEGINNER;
-        }
-
+    private void setSpeed(int generation){
         switch (horseGroup) {
             case HorseGroup.ADVANCED:
                 if(generation >= 3) {
@@ -57,24 +51,59 @@ public class Horse implements Runnable {
                 }
                 break;
             case HorseGroup.BEGINNER:
-                
+                if(speed <= 0){
+                    speed = getRandSpeed(1, 10);
+                }
                 break;
             default:
-                System.out.println("Something went wrong there shouldn't be a default");
+                speed = getRandSpeed(1, 10);
                 break;
         }
     }
 
     public void run(){
-        if(condition.equals(CONDITION.NOT_HEALTHY.toString())) {
-            System.out.println("Unable to run due to being unhealthy");
+        if(condition.equals(Condition.NOT_HEALTHY)) {
+            System.out.println(name + " is Unable to run due to being unhealthy");
             return;
         }
+
+
+        setSpeed(lap);
+        distance -= speed;
+        if(distance <= 0){
+            distance = 0;
+            System.out.println(name + " ran " + speed + " remaining " + distance);
+            System.out.println(warCry);
+        } else {
+            System.out.println(name + " ran " + speed + " remaining " + distance);
+        }
+        lap++;
     }
 
-    
+    public double getDistance(){
+        return distance;
+    }
+    public int getAge(){
+        return age;
+    }
+
+    public void setHorseGroup(HorseGroup horseGroup){
+        this.horseGroup = horseGroup;
+    }
+    public HorseGroup getHorseGroup(){
+        return horseGroup;
+    }
+    public String getHorseName(){
+        return name;
+    }
+    public Condition getCondition(){
+        return condition;
+    }
     @Override
     public String toString() {
-        return "name: " + name + " warcry: " + warCry + " age: " + age + " condition: " + condition + " speed: " + speed;
+        if(distance <= 0) {
+            distance = 0;
+        }
+        return name + " ran " + speed + " remaining " + distance;
     }
 }
