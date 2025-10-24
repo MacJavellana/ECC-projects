@@ -268,18 +268,80 @@ public class Main {
                 System.out.println(instance + " Occurence/s at " + instanceLocation);
                 return;
             } else if(userInput.equals(SearchTarget.BOTH.toString())) {
-                //TODO not yet implemented
-                //only checks and validates userinput
 
-                System.out.print("Key to search");
+
+                System.out.print("Key to search ");
                 String key = scanner.nextLine();
 
 
-                System.out.print("value to search");
+                System.out.print("value to search ");
                 String value = scanner.nextLine();
 
 
-                isInputValid=true;
+                int toSearchKeyLen = key.length();
+                int rowIteration=0;
+                int colIteration =0;
+                for (Map<String,String> map : table) {
+                    colIteration=0;
+                    for (String mapKey: map.keySet()) {
+                        boolean isOccurred = false;
+                        for(int k = 0; k < 3; k++){
+                            if(toSearchKeyLen+k > 3) {
+                                if(debug) System.out.println("debug: break");                        
+                                break;
+                            }
+                            if(mapKey.substring(k, toSearchKeyLen+k).equals(key)) {
+                                instance++;
+                                if(!isOccurred) {
+                                    instanceLocation += "[" + rowIteration + "," + colIteration + "]";
+                                    isOccurred = true;
+                                }
+                                if(debug) System.out.println("DEBUG occurrance at: " + rowIteration + " " +colIteration);
+                            }
+                        
+                        }
+                        colIteration++;
+                    }
+                    rowIteration++;
+                }
+                System.out.println( instance + " key Occurence/s at " + instanceLocation);
+
+
+
+                int toSearchValueLen = value.length();
+                rowIteration=0;
+                colIteration =0;
+                instance = 0;
+                instanceLocation = "";
+                for (Map<String,String> map : table) {
+                    Collection<String> mapValues = map.values();
+                    colIteration=0;
+                    for (String mapValue: mapValues) {
+                        boolean isOccurred = false;
+
+                        for(int k = 0; k < 3; k++){
+                            if(toSearchValueLen+k > 3) {
+                                if(debug) System.out.println("debug: break");                        
+                                break;
+                            }
+                            if(mapValue.substring(k, toSearchValueLen+k).equals(value)) {
+                                instance++;
+                                if(!isOccurred) {
+                                    instanceLocation += "[" + rowIteration + "," + colIteration + "]";
+                                    isOccurred = true;
+                                }
+
+                            }
+                        }
+                        colIteration++;
+
+                    }
+                    rowIteration++;
+
+                }
+                System.out.println(instance + " value Occurence/s at " + instanceLocation);
+
+                return;
             }else {
                 System.out.println("Error no User Input found");
                 continue;
