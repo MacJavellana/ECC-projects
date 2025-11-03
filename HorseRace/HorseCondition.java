@@ -1,4 +1,4 @@
-public enum Condition {
+public enum HorseCondition {
         HEALTHY,
         NOT_HEALTHY
 }

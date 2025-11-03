@@ -1,21 +1,23 @@
 import java.util.Random;
+import java.sql.Timestamp;
+import java.time.format.DateTimeFormatter;
 
 public class Horse {
     
     private String name;
     private String warCry;
     private int age;
-    private Condition condition;
+    private HorseCondition condition;
     private double speed = 0;
     private HorseGroup horseGroup;
-    private int lap = 0;
+    private int cycle = 0;
     private double distance;
 
-    private Condition getRandCondition() {
+    private HorseCondition getRandCondition() {
         Random random = new Random();
-        return random.nextBoolean() ? Condition.HEALTHY : Condition.NOT_HEALTHY;
+        return random.nextBoolean() ? HorseCondition.HEALTHY : HorseCondition.NOT_HEALTHY;
     }
-    private int getRandSpeed(int min, int max){
+    private int getRandSpeed(int min, int max) {
         return (int)(Math.random() * (max - min + 1)) + min;
     }
 
@@ -25,17 +27,14 @@ public class Horse {
         this.age = age;
         condition = getRandCondition();
         horseGroup = HorseGroup.DEFAULT;
-        lap = 1;
+        cycle = 1;
         this.distance = distance;
 
     }
 
 
 
-    public String finished(){
-        return warCry;
-    }
-    private void setSpeed(int generation){
+    private void setSpeed(int generation) {
         switch (horseGroup) {
             case HorseGroup.ADVANCED:
                 if(generation >= 3) {
@@ -62,43 +61,54 @@ public class Horse {
     }
 
     public void run(){
-        if(condition.equals(Condition.NOT_HEALTHY)) {
+        if(condition.equals(HorseCondition.NOT_HEALTHY)) {
             System.out.println(name + " is Unable to run due to being unhealthy");
             return;
         }
 
 
-        setSpeed(lap);
+        Timestamp timestamp = Timestamp.from(java.time.Instant.now());
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("mm:ss.SSS");
+        String formattedTimestamp = timestamp.toLocalDateTime().format(formatter); 
+        setSpeed(cycle);
         distance -= speed;
+        String formattedDistance;;
         if(distance <= 0){
             distance = 0;
-            System.out.println(name + " ran " + speed + " remaining " + distance);
+            formattedDistance = String.format("%.2f", distance);
+            System.out.println(formattedTimestamp+ "ms " +name + " ran " + speed + " remaining " + formattedDistance);
             System.out.println(warCry);
         } else {
-            System.out.println(name + " ran " + speed + " remaining " + distance);
+            formattedDistance = String.format("%.2f", distance);
+            System.out.println(formattedTimestamp+ "ms " + name + " ran " + speed + " remaining " + formattedDistance);
         }
-        lap++;
+        cycle++;
     }
 
-    public double getDistance(){
+    public double getDistance() {
         return distance;
     }
-    public int getAge(){
+    public int getAge() {
         return age;
     }
 
-    public void setHorseGroup(HorseGroup horseGroup){
+    public void setHorseGroup(HorseGroup horseGroup) {
         this.horseGroup = horseGroup;
     }
-    public HorseGroup getHorseGroup(){
+    public HorseGroup getHorseGroup() {
         return horseGroup;
     }
-    public String getHorseName(){
+    public String getName() {
         return name;
     }
-    public Condition getCondition(){
+    public HorseCondition getCondition() {
         return condition;
     }
+    public String getWarCry() {
+        return warCry;
+    }
+
     @Override
     public String toString() {
         if(distance <= 0) {

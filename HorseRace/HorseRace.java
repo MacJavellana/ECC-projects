@@ -54,14 +54,14 @@ public class HorseRace {
                 horse.setHorseGroup(HorseGroup.BEGINNER);
             }
         }
-        horses = horses.stream().filter(horse ->horse.getCondition().equals(Condition.HEALTHY)).collect(Collectors.toList());
+        horses = horses.stream().filter(horse ->horse.getCondition().equals(HorseCondition.HEALTHY)).collect(Collectors.toList());
 
         AtomicInteger placement = new AtomicInteger(0);
         horses.parallelStream().forEach(horse ->{
                 while(horse.getDistance() > 0){
                     horse.run();
                 }
-                System.out.println("horse: " + horse.getHorseName() + " is finished at "+ placement.incrementAndGet());
+                System.out.println("horse: " + horse.getName() + " is finished at "+ placement.incrementAndGet());
             }
         );
 

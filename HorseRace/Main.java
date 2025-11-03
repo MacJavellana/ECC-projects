@@ -9,14 +9,23 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
         int noHorses = 0;
         int distance = 0;
+        int maxAge = 0;
         boolean isNoofHorsesValid = false;
-        while(!isNoofHorsesValid){
-            System.out.print("Number of horses: ");
+        while(!isNoofHorsesValid) {
+            System.out.print("Number of horses (max 56): ");
             String userInput = scanner.nextLine();
             try {
                 noHorses = Integer.parseInt(userInput);
             } catch (NumberFormatException e) {
                 System.out.println("please enter a valid number");
+                continue;
+            }
+            if(noHorses <= 0) {
+                System.out.println("please input a number above 0");
+                continue;
+            }
+            if(noHorses >= 57) {
+                System.out.println("Please input a number between 0 - 57");
                 continue;
             }
             isNoofHorsesValid=true;
@@ -37,33 +46,56 @@ public class Main {
         }
 
 
+        boolean isMaxAgeValid = false;
+        while(!isMaxAgeValid){
+            System.out.print("please input max horse age: ");
+            String userInput = scanner.nextLine();
+            try {
+                maxAge = Integer.parseInt(userInput);
+            } catch (NumberFormatException e) {
+                System.out.println("please enter a valid number");
+                continue;
+            }
+            isMaxAgeValid = true;
+        }
+
+
 
         List<Horse> horses = new ArrayList<>();
-        for (int i = 0; i < noHorses; i++) {
-            System.out.println("Horse " + (i+1));
-            System.out.print("name: " );
-            String name = scanner.nextLine();
 
-            System.out.print("War Cry: " );
-            String warCry = scanner.nextLine();
 
-            boolean isAgeValid = false;
-            int age =0;
-            while(!isAgeValid){
-                System.out.print("Age: " );
-                String ageString = scanner.nextLine();
-                try {
-                    age = Integer.parseInt(ageString);
-                } catch (Exception e) {
-                    System.out.println("please enter a valid age");
-                    continue;
-                }
-                isAgeValid = true;
-            }
+        // use of horse factory class
+        horses = HorseFactory.GenerateHorses(noHorses, maxAge, distance);
+
+
+        // manual addition
+        // for (int i = 0; i < noHorses; i++) {
+        //     System.out.println("Horse " + (i+1));
+        //     System.out.print("name: " );
+        //     String name = scanner.nextLine();
+
+        //     System.out.print("War Cry: " );
+        //     String warCry = scanner.nextLine();
+
+        //     boolean isAgeValid = false;
+        //     int age =0;
+        //     while(!isAgeValid) {
+        //         System.out.print("Age: " );
+        //         String ageString = scanner.nextLine();
+        //         try {
+        //             age = Integer.parseInt(ageString);
+        //         } catch (Exception e) {
+        //             System.out.println("please enter a valid age");
+        //             continue;
+        //         }
+        //         isAgeValid = true;
+        //     }
             
-            horses.add(new Horse(name, warCry, age, distance));
-        }
+        //     horses.add(new Horse(name, warCry, age, distance));
+        // }
         
+
+
 
 
 
