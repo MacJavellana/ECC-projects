@@ -61,9 +61,13 @@ public class HorseRace {
                 while(horse.getDistance() > 0){
                     horse.run();
                 }
-                System.out.println("horse: " + horse.getName() + " is finished at "+ placement.incrementAndGet());
+                horse.setRank (placement.incrementAndGet());
             }
         );
+        horses.stream().sorted((h1, h2) -> h1.getRank().compareTo(h2.getRank())).forEach( horse ->{
+            System.out.println(horse.getName() + " is ranked " + horse.getRank());
+        });
+
 
 
     }

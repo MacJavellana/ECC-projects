@@ -12,6 +12,7 @@ public class Horse {
     private HorseGroup horseGroup;
     private int cycle = 0;
     private double distance;
+    private int rank = 0;
 
     private HorseCondition getRandCondition() {
         Random random = new Random();
@@ -107,6 +108,12 @@ public class Horse {
     }
     public String getWarCry() {
         return warCry;
+    }
+    public String getRank() {
+        return ""+rank;
+    }
+    public void setRank(int rank) {
+        this.rank = rank;
     }
 
     @Override
