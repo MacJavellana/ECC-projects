@@ -67,9 +67,6 @@ public class HorseRace {
         horses.stream().sorted((h1, h2) -> h1.getRank().compareTo(h2.getRank())).forEach( horse ->{
             System.out.println(horse.getName() + " is ranked " + horse.getRank());
         });
-
-
-
     }
 
 }
