@@ -1,4 +1,4 @@
-package com.exist;
+package com.exist.app;
 
 /**
  * Hello world!

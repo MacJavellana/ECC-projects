@@ -19,12 +19,29 @@
         <version>3.8.1</version>
         <scope>test</scope>
       </dependency>
+      <dependency>
+        <groupId>org.netbeans.external</groupId>
+        <artifactId>org-apache-commons-io</artifactId>
+        <version>RELEASE113</version>
+    </dependency>
     </dependencies>
   </dependencyManagement>
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-shade-plugin</artifactId>
+          <version>3.6.1</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
   <modules>
-    <module>app</module>
     <module>model</module>
-    <module>service</module>
     <module>utilities</module>
+    <module>service</module>
+    <module>app</module>
+    
   </modules>
 </project>

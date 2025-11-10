@@ -7,15 +7,26 @@
     <artifactId>convert_maven_activity_2</artifactId>
     <version>1.0-SNAPSHOT</version>
   </parent>
-  <groupId>com.exist</groupId>
+
+
   <artifactId>utilities</artifactId>
-  <version>1.0-SNAPSHOT</version>
   <name>utilities</name>
-  <url>http://maven.apache.org</url>
+
+
   <dependencies>
+    <dependency>
+      <groupId>com.exist</groupId>
+      <artifactId>model</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.netbeans.external</groupId>
+      <artifactId>org-apache-commons-io</artifactId>
+    </dependency>
   </dependencies>
+  
 </project>
