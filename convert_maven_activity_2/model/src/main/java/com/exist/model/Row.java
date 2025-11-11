@@ -1,46 +1,32 @@
 package com.exist.model;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class Row {
-    private final List<Cell> cells;
+    private List<Cell> cells;
 
     public Row() {
         this.cells = new ArrayList<>();
     }
 
-    public void addCell(Cell cell) {
-        if (cells.stream().anyMatch(c -> c.getKey().equals(cell.getKey()))) {
-            throw new IllegalArgumentException("Key '" + cell.getKey() + "' already exists in this row");
-        }
-        cells.add(cell);
-    }
-
-    public void setCell(int index, Cell cell) {
-        if (index < 0 || index > cells.size()) {
-            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + cells.size());
-        }
-
-        if (cells.stream().anyMatch(c -> c.getKey().equals(cell.getKey()))) {
-            throw new IllegalArgumentException("Key '" + cell.getKey() + "' already exists in this row");
-        }
-
-        if (index == cells.size()) {
-            cells.add(cell);
-        } else {
-            cells.set(index, cell);
-        }
-    }
-
-    public List<Cell> getRow() {
+    public List<Cell> getCells() {
         return cells;
     }
+
+    public void setCells(List<Cell> cells) {
+        this.cells = cells;
+    }
     
-    public Cell getCell(int index) {
+    public void addCell(Cell cell) {
+        this.cells.add(cell);
+    }
+    
+    public Optional<Cell> getCell(int index) {
         if (index >= 0 && index < cells.size()) {
-            return cells.get(index);
+            return Optional.of(cells.get(index));
         }
-        return null;
+        return Optional.empty();
     }
     
     public int getCellCount() {

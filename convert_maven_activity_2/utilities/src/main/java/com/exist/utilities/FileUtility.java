@@ -12,18 +12,29 @@ import java.util.List;
 public class FileUtility {
     public static boolean debug = true;
 
+
     public static Table readTableFromFile(String fileName) {
+        // If no filename provided, use default data.txt in root
         if (fileName == null || fileName.trim().isEmpty()) {
-            System.out.println("Please enter a file name");
-            return null;
+            fileName = "data.txt";
+        }
+        
+        // Ensure .txt extension if not provided
+        if (!fileName.toLowerCase().endsWith(".txt")) {
+            fileName = fileName + ".txt";
         }
 
         try {
             File file = new File(fileName);
             
             if (!file.exists()) {
-                System.out.println("File doesn't exist: " + fileName);
-                return null;
+                System.out.println("File doesn't exist: " + fileName + ". Creating new file...");
+                // Create the file automatically
+                if (createFile(fileName)) {
+                    return null; // Return null so calling code can generate new table
+                } else {
+                    return null;
+                }
             }
             
             if (!file.canRead()) {
@@ -104,8 +115,12 @@ public class FileUtility {
 
     public static boolean writeTableToFile(String fileName, Table table) {
         if (fileName == null || fileName.trim().isEmpty()) {
-            System.out.println("Please enter a file name");
-            return false;
+            fileName = "data.txt"; // Default filename
+        }
+        
+        // Ensure .txt extension if not provided
+        if (!fileName.toLowerCase().endsWith(".txt")) {
+            fileName = fileName + ".txt";
         }
 
         if (table == null || table.getTable().isEmpty()) {
@@ -116,9 +131,12 @@ public class FileUtility {
         try {
             File file = new File(fileName);
             
+            // Create file if it doesn't exist
             if (!file.exists()) {
-                System.out.println("File doesn't exist: " + fileName);
-                return false;
+                System.out.println("File doesn't exist. Creating: " + fileName);
+                if (!createFile(fileName)) {
+                    return false;
+                }
             }
             
             if (!file.canWrite()) {
@@ -131,7 +149,7 @@ public class FileUtility {
             
             for (Row row : rows) {
                 StringBuilder line = new StringBuilder();
-                List<Cell> cells = row.getRow();
+                List<Cell> cells = row.getCells();
                 
                 for (Cell cell : cells) {
                     line.append(cell.getKey()).append(" ").append(cell.getValue()).append(" ");
@@ -155,6 +173,12 @@ public class FileUtility {
     public static boolean createFile(String fileName) {
         try {
             File file = new File(fileName);
+            // Create parent directories if they don't exist
+            File parentDir = file.getParentFile();
+            if (parentDir != null && !parentDir.exists()) {
+                parentDir.mkdirs();
+            }
+            
             if (file.createNewFile()) {
                 System.out.println("Created new file: " + fileName);
                 return true;
@@ -168,9 +192,15 @@ public class FileUtility {
         }
     }
 
+
+    public static String getDefaultDataFile() {
+        return "data.txt";
+    }
+
+
     public static boolean isValidFile(String fileName) {
         if (fileName == null || fileName.trim().isEmpty()) {
-            return false;
+            fileName = "data.txt"; // Default filename
         }
         
         File file = new File(fileName);
@@ -180,11 +210,14 @@ public class FileUtility {
 
     public static boolean isWritable(String fileName) {
         if (fileName == null || fileName.trim().isEmpty()) {
-            return false;
+            fileName = "data.txt"; // Default filename
         }
         
         File file = new File(fileName);
-        return file.exists() && file.canWrite() && file.isFile();
+        if (!file.exists()) {
+            return createFile(fileName);
+        }
+        return file.canWrite() && file.isFile();
     }
 
     public static long getFileSize(String fileName) {
