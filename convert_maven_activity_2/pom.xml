@@ -7,6 +7,13 @@
   <name>convert_maven_activity_2</name>
   <!-- FIXME change it to the project's website -->
   <url>http://www.example.com</url>
+  <modules>
+    <module>model</module>
+    <module>utilities</module>
+    <module>service</module>
+    <module>app</module>
+    
+  </modules>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.release>17</maven.compiler.release>
@@ -37,11 +44,5 @@
       </plugins>
     </pluginManagement>
   </build>
-  <modules>
-    <module>model</module>
-    <module>utilities</module>
-    <module>service</module>
-    <module>app</module>
-    
-  </modules>
+  
 </project>
