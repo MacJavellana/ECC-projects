@@ -10,9 +10,9 @@ import com.exist.utilities.RandomUtility;
 import java.util.*;
 
 public class TableService {
-    private static boolean debug = true;
+    private boolean debug = true;
 
-    public static Table generateTable(int rows, int cols) {
+    public Table generateTable(int rows, int cols) {
         Table table = new Table();
         
         for (int i = 0; i < rows; i++) {
@@ -46,7 +46,7 @@ public class TableService {
         return table;
     }
 
-    public static void displayTable(Table table) {
+    public void displayTable(Table table) {
         List<Row> rows = table.getTable();
         
         for (int i = 0; i < rows.size(); i++) {
@@ -61,7 +61,7 @@ public class TableService {
     }
 
 
-    public static void addRow(Table table, int numOfCells) {
+    public void addRow(Table table, int numOfCells) {
         Row newRow = new Row();
         
         for (int j = 0; j < numOfCells; j++) {
@@ -89,7 +89,7 @@ public class TableService {
     }
     
     
-    public static Cell getCellAt(Table table, int rowIndex, int colIndex) {
+    public Cell getCellAt(Table table, int rowIndex, int colIndex) {
         if (rowIndex < 0 || rowIndex >= table.getTable().size()) {
             return null;
         }
@@ -101,17 +101,17 @@ public class TableService {
         
         return row.getCells().get(colIndex);
     }
-    public static void updateCell(Table table, int rowIndex, int colIndex, String newKey, String newValue) {
+    public void updateCell(Table table, int rowIndex, int colIndex, String newKey, String newValue) {
         Cell cell = getCellAt(table, rowIndex, colIndex);
         if (cell != null) {
             cell.setKey(newKey);
             cell.setValue(newValue);
         }
     }
-    public static int getRowCount(Table table) {
+    public int getRowCount(Table table) {
         return table.getTable().size();
     }
-    public static int getColumnCount(Table table, int rowIndex) {
+    public int getColumnCount(Table table, int rowIndex) {
         if (rowIndex < 0 || rowIndex >= table.getTable().size()) {
             return 0;
         }
@@ -120,7 +120,7 @@ public class TableService {
 
 
 
-    public static SearchResult searchByKey(Table table, String key) {
+    public SearchResult searchByKey(Table table, String key) {
         int instances = 0;
         StringBuilder locations = new StringBuilder();
         int searchLength = key.length();
@@ -152,7 +152,7 @@ public class TableService {
         result.setLocations(locations.toString());
         return result;
     }
-    public static SearchResult searchByValue(Table table, String value) {
+    public SearchResult searchByValue(Table table, String value) {
         int instances = 0;
         StringBuilder locations = new StringBuilder();
         int searchLength = value.length();
@@ -184,7 +184,7 @@ public class TableService {
         result.setLocations(locations.toString());
         return result;
     }
-    public static BothSearchResult searchBoth(Table table, String key, String value) {
+    public BothSearchResult searchBoth(Table table, String key, String value) {
         SearchResult keyResult = searchByKey(table, key);
         SearchResult valueResult = searchByValue(table, value);
         return new BothSearchResult(keyResult, valueResult);
@@ -192,7 +192,7 @@ public class TableService {
 
 
     
-    public static boolean editKey(Table table, int rowIndex, int colIndex, String newKey) {
+    public boolean editKey(Table table, int rowIndex, int colIndex, String newKey) {
 
         if (!isValidCellPosition(table, rowIndex, colIndex)) {
             System.out.println("invalid cell position");
@@ -219,7 +219,7 @@ public class TableService {
         row.getCells().set(colIndex, newCell);
         return true;
     }
-    public static boolean editValue(Table table, int rowIndex, int colIndex, String newValue) {
+    public boolean editValue(Table table, int rowIndex, int colIndex, String newValue) {
 
         if (!isValidCellPosition(table, rowIndex, colIndex)) {
             System.out.println("invalid cell position");
@@ -235,7 +235,7 @@ public class TableService {
         row.getCells().get(colIndex).setValue(newValue);
         return true;
     }
-    public static boolean editBoth(Table table, int rowIndex, int colIndex, String newKey, String newValue) {
+    public boolean editBoth(Table table, int rowIndex, int colIndex, String newKey, String newValue) {
 
         if (!isValidCellPosition(table, rowIndex, colIndex)) {
             System.out.println("invalid cell position");
@@ -263,7 +263,7 @@ public class TableService {
     }
     
     
-    public static boolean sortRow(Table table, int rowIndex, SortOrder order) {
+    public boolean sortRow(Table table, int rowIndex, SortOrder order) {
         if (!isValidRowIndex(table, rowIndex)) {
             return false;
         }
@@ -296,15 +296,15 @@ public class TableService {
     }
 
 
-    public static Table resetTable(int rows, int cols) {
+    public Table resetTable(int rows, int cols) {
         return generateTable(rows, cols);
     }
 
 
-    private static boolean isValidRowIndex(Table table, int rowIndex) {
+    private boolean isValidRowIndex(Table table, int rowIndex) {
         return rowIndex >= 0 && rowIndex < table.getTable().size();
     }
-    private static boolean isValidCellPosition(Table table, int rowIndex, int colIndex) {
+    private boolean isValidCellPosition(Table table, int rowIndex, int colIndex) {
         return isValidRowIndex(table, rowIndex) && 
                colIndex >= 0 && colIndex < table.getTable().get(rowIndex).getCells().size();
     }

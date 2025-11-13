@@ -8,7 +8,6 @@ import com.exist.utilities.InputUtility;
 public class App {
     private static Table table;
     private static String fileName;
-    private static boolean debug = true;
 
     public static void main(String[] args) {
         initializeTable(args);
@@ -22,11 +21,12 @@ public class App {
         // Try to read table from file
         table = FileUtility.readTableFromFile(fileName);
         
+        TableService tableService = new TableService();
         // If file reading failed or file was empty, generate new table
         if (table == null) {
             System.out.println("Creating new table...");
             UserInputDimensions dimensions = InputUtility.getValidTableDimensions();
-            table = TableService.generateTable(dimensions.getRow(), dimensions.getCol());
+            table = tableService.generateTable(dimensions.getRow(), dimensions.getCol());
             FileUtility.writeTableToFile(fileName, table);
         }
         
@@ -75,24 +75,25 @@ public class App {
     private static void handleSearch() {
         String searchTarget = InputUtility.getValidSearchTarget();
         SearchTarget target = SearchTarget.valueOf(searchTarget);
+        TableService tableService = new TableService();
         
         switch (target) {
             case KEY:
                 String key = InputUtility.getValidSearchInput("Key to search: ");
-                SearchResult keyResult = TableService.searchByKey(table, key);
+                SearchResult keyResult = tableService.searchByKey(table, key);
                 System.out.println(keyResult.getOccurrences() + " occurrence(s) at " + keyResult.getLocations());
                 break;
                 
             case VALUE:
                 String value = InputUtility.getValidSearchInput("Value to search: ");
-                SearchResult valueResult = TableService.searchByValue(table, value);
+                SearchResult valueResult = tableService.searchByValue(table, value);
                 System.out.println(valueResult.getOccurrences() + " occurrence(s) at " + valueResult.getLocations());
                 break;
                 
             case BOTH:
                 String searchKey = InputUtility.getValidSearchInput("Key to search: ");
                 String searchValue = InputUtility.getValidSearchInput("Value to search: ");
-                BothSearchResult bothResult = TableService.searchBoth(table, searchKey, searchValue);
+                BothSearchResult bothResult = tableService.searchBoth(table, searchKey, searchValue);
                 System.out.println("Key: " + bothResult.getKeyResults().getOccurrences() + " occurrence(s) at " + bothResult.getKeyResults().getLocations());
                 System.out.println("Value: " + bothResult.getValueResults().getOccurrences() + " occurrence(s) at " + bothResult.getValueResults().getLocations());
                 break;
@@ -100,13 +101,15 @@ public class App {
     }
 
     private static void handleEdit() {
-        int maxRows = TableService.getRowCount(table);
+        TableService tableService = new TableService();
+
+        int maxRows = tableService.getRowCount(table);
         if (maxRows == 0) {
             System.out.println("Table is empty. Nothing to edit.");
             return;
         }
         
-        int maxCols = TableService.getColumnCount(table, 0); // Assuming all rows have same columns
+        int maxCols = tableService.getColumnCount(table, 0); // Assuming all rows have same columns
         int[] position = InputUtility.getValidCellPosition(maxRows, maxCols);
         int row = position[0];
         int col = position[1];
@@ -118,17 +121,17 @@ public class App {
         switch (target) {
             case KEY:
                 String newKey = InputUtility.getValidThreeCharInput("New key: ");
-                success = TableService.editKey(table, row, col, newKey);
+                success = tableService.editKey(table, row, col, newKey);
                 break;
                 
             case VALUE:
                 String newValue = InputUtility.getValidThreeCharInput("New value: ");
-                success = TableService.editValue(table, row, col, newValue);
+                success = tableService.editValue(table, row, col, newValue);
                 break;
                 
             case BOTH:
                 String[] keyValue = InputUtility.getValidKeyValueInput();
-                success = TableService.editBoth(table, row, col, keyValue[0], keyValue[1]);
+                success = tableService.editBoth(table, row, col, keyValue[0], keyValue[1]);
                 break;
         }
         
@@ -141,14 +144,20 @@ public class App {
     }
 
     private static void handleAddRow() {
+        TableService tableService = new TableService();
+
         int numCells = InputUtility.getValidNumberInput(NumberType.VALID_NUM, 0, "How many cells to add: ");
-        TableService.addRow(table, numCells);
+        tableService.addRow(table, numCells);
         FileUtility.writeTableToFile(fileName, table);
         displayTable();
     }
 
     private static void handleSort() {
-        int maxRows = TableService.getRowCount(table);
+
+        TableService tableService = new TableService();
+
+
+        int maxRows = tableService.getRowCount(table);
         if (maxRows == 0) {
             System.out.println("Table is empty. Nothing to sort.");
             return;
@@ -158,7 +167,7 @@ public class App {
         int rowToSort = InputUtility.getValidNumberInput(NumberType.VALID_ROW_NUM, maxRows, prompt);
         SortOrder order = InputUtility.getValidSortOrder();
         
-        boolean success = TableService.sortRow(table, rowToSort, order);
+        boolean success = tableService.sortRow(table, rowToSort, order);
         if (success) {
             FileUtility.writeTableToFile(fileName, table);
             displayTable();
@@ -168,15 +177,19 @@ public class App {
     }
 
     private static void handleReset() {
+        TableService tableService = new TableService();
+
         UserInputDimensions dimensions = InputUtility.getValidTableDimensions();
-        table = TableService.resetTable(dimensions.getRow(), dimensions.getCol());
+        table = tableService.resetTable(dimensions.getRow(), dimensions.getCol());
         FileUtility.writeTableToFile(fileName, table);
         displayTable();
     }
 
-    private static void displayTable() {
+    private static void displayTable() {        
+        TableService tableService = new TableService();
+
         System.out.println("\nCurrent Table:");
-        TableService.displayTable(table);
+        tableService.displayTable(table);
         System.out.println();
     }
 
